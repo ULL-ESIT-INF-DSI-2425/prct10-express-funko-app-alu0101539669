@@ -1,0 +1,37 @@
+name: Coveralls
+ 
+on: 
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x,20.x] 
+    
+    steps:
+      - name: Cloning repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{matrix.node-version }}
+
+      - name: Installing dependences
+        run: npm ci
+
+      - name: Generating coverage information      
+        run: npx vitest run --coverage
+
+      - name: Coveralls Github 
+        uses: coverallsapp/github-action@v2.3.6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+ 
