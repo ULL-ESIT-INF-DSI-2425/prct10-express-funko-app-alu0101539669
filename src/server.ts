@@ -1,144 +1,175 @@
-//SERVIDOR
-import net from 'net';
-import { RequestType, ResponseType } from './type.js';
-import { addFunko, eliminarFunko, listaFunkos, mostrarFunko, modificarFunko } from './funciones.js';
+// //SERVIDOR
+// import net from 'net';
+// import { promises as fs } from 'fs';
+// import path from 'path';
+// import { RequestType, ResponseType } from './types.js'; // Importamos los tipos de datos
+// import { addFunko, eliminarFunko, listaFunkos, mostrarFunko, modificarFunko } from './funciones.js'; // Importamos las funciones para manejar los Funkos
 
-// Crear un servidor que escucha conexiones de clientes
-net.createServer((connection) => {
-    console.log('A client has connected.');
+// // Creamos el servidor
+// net.createServer((socket) => {
+//     console.log('Cliente conectado');
+    
+//     // Manejar la recepción de datos del cliente
+//     socket.on('data', async (data) => {
+//         const request: RequestType = JSON.parse(data.toString()); // Parseamos la solicitud del cliente
+//         let response: ResponseType; // Inicializamos la respuesta
 
-    // Enviar un mensaje inicial al cliente indicando que la conexión se ha establecido
-    connection.write(JSON.stringify({ message: 'Connection established.' }));
+//         const userDir = path.join('./database', request.funkoPop?.usuario || ''); // Directorio del usuario
 
-    // Manejar los datos recibidos del cliente
-    connection.on('data', (data) => {
-        const request: RequestType = JSON.parse(data.toString()); // Parsear la solicitud del cliente
-        let response: ResponseType;
+//         try {
+//             switch (request.type) {
+//                 case 'add': // Caso para añadir un Funko
+//                     if (request.funkoPop) {
+//                         await fs.mkdir(userDir, { recursive: true }); // Crear directorio del usuario si no existe
+//                         const filePath = path.join(userDir, `${request.funkoPop.id}.json`); // Ruta del archivo del Funko
+//                         if (await fs.access(filePath).then(() => true).catch(() => false)) {
+//                             // Si el archivo ya existe, devolvemos un error
+//                             response = {
+//                                 type: 'add',
+//                                 success: false,
+//                                 message: 'Funko ya existe en la colección'
+//                             };
+//                         } else {
+//                             // Si no existe, lo añadimos
+//                             await fs.writeFile(filePath, JSON.stringify(request.funkoPop));
+//                             response = {
+//                                 type: 'add',
+//                                 success: true,
+//                                 message: 'Funko añadido correctamente'
+//                             };
+//                         }
+//                     } else {
+//                         // Si no se proporciona un Funko válido
+//                         response = {
+//                             type: 'error',
+//                             success: false,
+//                             message: 'No se ha proporcionado un Funko válido'
+//                         };
+//                     }
+//                     break;
+//                 case 'modify': // Caso para modificar un Funko
+//                     if (request.funkoPop) {
+//                         const filePath = path.join(userDir, `${request.funkoPop.id}.json`);
+//                         if (await fs.access(filePath).then(() => true).catch(() => false)) {
+//                             await fs.writeFile(filePath, JSON.stringify(request.funkoPop));
+//                             response = {
+//                                 type: 'modify',
+//                                 success: true,
+//                                 message: 'Funko modificado correctamente'
+//                             };
+//                         } else {
+//                             response = {
+//                                 type: 'modify',
+//                                 success: false,
+//                                 message: 'Funko no encontrado en la colección'
+//                             };
+//                         }
+//                     } else {
+//                         response = {
+//                             type: 'error',
+//                             success: false,
+//                             message: 'No se ha proporcionado un Funko válido'
+//                         };
+//                     }
+//                     break;
+//                 case 'remove': // Caso para eliminar un Funko
+//                     if (request.funkoPop) {
+//                         const filePath = path.join(userDir, `${request.funkoPop.id}.json`);
+//                         if (await fs.access(filePath).then(() => true).catch(() => false)) {
+//                             await fs.unlink(filePath);
+//                             response = {
+//                                 type: 'remove',
+//                                 success: true,
+//                                 message: 'Funko eliminado correctamente'
+//                             };
+//                         } else {
+//                             response = {
+//                                 type: 'remove',
+//                                 success: false,
+//                                 message: 'Funko no encontrado en la colección'
+//                             };
+//                         }
+//                     } else {
+//                         response = {
+//                             type: 'error',
+//                             success: false,
+//                             message: 'No se ha proporcionado un Funko válido'
+//                         };
+//                     }
+//                     break;
+//                 case 'read': // Caso para leer un Funko
+//                     if (request.funkoPop) {
+//                         const filePath = path.join(userDir, `${request.funkoPop.id}.json`);
+//                         if (await fs.access(filePath).then(() => true).catch(() => false)) {
+//                             const funkoData = await fs.readFile(filePath, 'utf8');
+//                             response = {
+//                                 type: 'read',
+//                                 success: true,
+//                                 message: 'Funko encontrado',
+//                                 funkoPops: [JSON.parse(funkoData)]
+//                             };
+//                         } else {
+//                             response = {
+//                                 type: 'read',
+//                                 success: false,
+//                                 message: 'Funko no encontrado en la colección'
+//                             };
+//                         }
+//                     } else {
+//                         response = {
+//                             type: 'error',
+//                             success: false,
+//                             message: 'No se ha proporcionado un Funko válido'
+//                         };
+//                     }
+//                     break;
+//                 case 'list': // Caso para listar todos los Funkos de un usuario
+//                     if (await fs.access(userDir).then(() => true).catch(() => false)) {
+//                         const files = await fs.readdir(userDir);
+//                         const funkos = await Promise.all(files.map(async (file) => {
+//                             const content = await fs.readFile(path.join(userDir, file), 'utf8');
+//                             return JSON.parse(content);
+//                         }));
+//                         response = {
+//                             type: 'list',
+//                             success: true,
+//                             message: 'Lista de Funkos',
+//                             funkoPops: funkos
+//                         };
+//                     } else {
+//                         response = {
+//                             type: 'list',
+//                             success: false,
+//                             message: 'Usuario no tiene colección'
+//                         };
+//                     }
+//                     break;
+//                 default:
+//                     // Caso para operaciones no soportadas
+//                     response = {
+//                         type: 'error',
+//                         success: false,
+//                         message: 'Tipo de operación no soportado'
+//                     };
+//             }
+//         } catch (err) {
+//             // Manejo de errores generales
+//             response = {
+//                 type: 'error',
+//                 success: false,
+//                 message: `Error procesando la solicitud: ${err instanceof Error ? err.message : 'Error desconocido'}`
+//             };
+//         }
 
-        // Procesar la solicitud según el tipo
-        switch (request.type) {
-            case 'add':
-                // Agregar un nuevo Funko
-                const addSuccess = addFunko(
-                    request.funkoPop!.id,
-                    request.funkoPop!.usuario,
-                    request.funkoPop!.nombre,
-                    request.funkoPop!.descripcion,
-                    request.funkoPop!.tipo,
-                    request.funkoPop!.genero,
-                    request.funkoPop!.franquicia,
-                    request.funkoPop!.numero,
-                    request.funkoPop!.exclusivo,
-                    request.funkoPop!.caracteristicasEspeciales,
-                    request.funkoPop!.valorMercado
-                );
-                response = {
-                    type: 'add',
-                    success: addSuccess,
-                    message: addSuccess ? 'Funko added successfully' : 'Failed to add Funko',
-                };
-                break;
+//         // Enviar la respuesta al cliente
+//         socket.write(JSON.stringify(response), () => {
+//             socket.end(); // Cierra la conexión con el cliente después de enviar la respuesta
+//         });
+//     });
 
-            case 'modify':
-                // Modificar un Funko existente
-                const modifySuccess = modificarFunko(
-                    request.funkoPop!.id,
-                    request.funkoPop!.usuario,
-                    request.funkoPop!.nombre,
-                    request.funkoPop!.descripcion,
-                    request.funkoPop!.tipo,
-                    request.funkoPop!.genero,
-                    request.funkoPop!.franquicia,
-                    request.funkoPop!.numero,
-                    request.funkoPop!.exclusivo,
-                    request.funkoPop!.caracteristicasEspeciales,
-                    request.funkoPop!.valorMercado
-                );
-                response = {
-                    type: 'modify',
-                    success: modifySuccess,
-                    message: modifySuccess ? 'Funko modified successfully' : 'Failed to modify Funko',
-                };
-                break;
-
-            case 'remove':
-                // Eliminar un Funko
-                const removeSuccess = eliminarFunko(
-                    request.funkoPop!.usuario,
-                    request.funkoPop!.id
-                );
-                response = {
-                    type: 'remove',
-                    success: removeSuccess,
-                    message: removeSuccess ? 'Funko removed successfully' : 'Failed to remove Funko',
-                };
-                break;
-
-            case 'read':
-                // Leer los detalles de un Funko específico
-                const funko = mostrarFunko(
-                    request.funkoPop!.usuario,
-                    request.funkoPop!.id
-                );
-                response = {
-                    type: 'read',
-                    success: funko !== null,
-                    message: funko !== null ? 'Funko found' : 'Funko not found',
-                    funkoPops: funko && typeof funko === 'object' ? [funko] : undefined,
-                };
-                break;
-
-            case 'list':
-                // Listar todos los Funkos de un usuario
-                const funkos = listaFunkos(request.funkoPop!.usuario);
-                response = {
-                    type: 'list',
-                    success: Array.isArray(funkos) && funkos.length > 0,
-                    message: Array.isArray(funkos) && funkos.length > 0 ? 'Funkos listed successfully' : 'No Funkos found for the user',
-                    funkoPops: Array.isArray(funkos) ? funkos : undefined,
-                };
-                break;
-
-            default:
-                // Manejar solicitudes no válidas
-                response = {
-                    type: 'error',
-                    success: false,
-                    message: 'Invalid request type',
-                };
-                break;
-        }
-
-        // Enviar la respuesta al cliente y cerrar la conexión
-        connection.write(JSON.stringify(response)); // Enviar respuesta al cliente
-        connection.end(); // Cerrar la conexión
-    });
-
-    // Manejar errores en la conexión
-    connection.on('error', (err) => {
-        if ((err as NodeJS.ErrnoException).code === 'ECONNRESET') {
-            console.error('Client disconnected abruptly:', err.message);
-        } else {
-            console.error('Error:', err);
-        }
-    });
-
-    // Manejar el cierre de la conexión por parte del cliente
-    connection.on('end', () => {
-        console.log('Client disconnected.');
-    });
-
-    connection.on('close', () => {
-        console.log('Client disconnected.');
-    });
-
-    // Manejar el tiempo de espera de la conexión
-    connection.on('timeout', () => {
-        console.log('Connection timed out.');
-        connection.end();
-    });
-
-}).listen(60300, () => {
-    // Mensaje indicando que el servidor está esperando conexiones
-    console.log('Waiting for clients to connect.');
-});
+//     socket.on('end', () => {
+//         console.log('Cliente desconectado'); // Mensaje cuando el cliente se desconecta
+//     });
+// }).listen(60300, () => {
+//     console.log('Servidor escuchando en el puerto 60300'); // Mensaje cuando el servidor comienza a escuchar
+// });
