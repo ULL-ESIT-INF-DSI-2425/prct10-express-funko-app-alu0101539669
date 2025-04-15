@@ -1,78 +1,24 @@
-// /**
-//  * Enum para los tipos de Funkos.
-//  */
-// export enum Tipo {
-//   Pop = "Pop!",
-//   PopRides = "Pop! Rides",
-//   VynilSoda = "Vynil Soda",
-//   VynilGold = "Vynil Gold",
-//   VynilPlatinum = "Vynil Platinum",
-// }
+export type FunkoType = 'Pop!' | 'Pop! Rides' | 'Vynil Soda' | 'Vynil Gold';
 
-// /**
-//  * Enum para los géneros de Funkos.
-//  */
-// export enum Genero {
-//   Animacion = "Animacion",
-//   PeliculasYTV = "Peliculas y TV",
-//   Videojuegos = "Games",
-//   Deportes = "Deportes",
-//   Musica = "Música",
-//   Anime = "Anime",
-// }
+export type FunkoGenre = 'Animación' | 'Películas y TV' | 'Videojuegos' | 'Deportes' | 'Música' | 'Ánime';
 
-// /**
-//  * Tipo para las solicitudes al servidor.
-//  */
-// export type RequestType = {
-//   type: 'add' | 'modify' | 'remove' | 'read' | 'list';
-//   funkoPop?: {
-//     id: number;
-//     usuario: string;
-//     nombre: string;
-//     descripcion: string;
-//     tipo: Tipo;
-//     genero: Genero;
-//     franquicia: string;
-//     numero: number;
-//     exclusivo: boolean;
-//     caracteristicasEspeciales: string;
-//     valorMercado: number;
-//   };
-// };
-
-// /**
-//  * Tipo para las respuestas del servidor.
-//  */
-// export type ResponseType = {
-//   type: 'add' | 'modify' | 'remove' | 'read' | 'list' | 'error';
-//   success: boolean;
-//   message: string;
-//   funkoPops?: {
-//     id: number;
-//     usuario: string;
-//     nombre: string;
-//     descripcion: string;
-//     tipo: Tipo;
-//     genero: Genero;
-//     franquicia: string;
-//     numero: number;
-//     exclusivo: boolean;
-//     caracteristicasEspeciales: string;
-//     valorMercado: number;
-//   }[];
-// };
-
-export type Color = "green" | "yellow" | "blue" | "red" | "magenta";
-
-export type Note = {
-  title: string;
-  body: string;
-  color: Color;
+export type FunkoPop = {
+  id: number;
+  name: string;
+  description: string;
+  type: FunkoType;
+  genre: FunkoGenre;
+  franchise: string;
+  number: number;
+  exclusive: boolean;
+  specialFeatures: string;
+  marketValue: number;
 };
 
 export type ResponseType = {
-  type: "add" | "remove" | "read" | "list";
+  
   success: boolean;
-  notes?: Note[];
+  message?: string;
+  funkoPop?: FunkoPop;
+  funkoPops?: FunkoPop[];
 };
