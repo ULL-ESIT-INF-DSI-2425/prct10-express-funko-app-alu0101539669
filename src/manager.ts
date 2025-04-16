@@ -48,7 +48,8 @@ export async function updateFunko(user: string, funko: FunkoPop): Promise<Respon
 
 export async function deleteFunko(user: string, id: number): Promise<ResponseType> {
   const userPath = await ensureUserDir(user);
-  const filePath = path.join(userPath, `${id}.json`);
+  const filePath = path.join(userPath, `${user}_${id}.json`);
+
   try {
     await fs.access(filePath);
     await fs.rm(filePath);
@@ -76,7 +77,8 @@ export async function listFunkos(user: string): Promise<ResponseType> {
 
 export async function getFunko(user: string, id: number): Promise<ResponseType> {
   const userPath = await ensureUserDir(user);
-  const filePath = path.join(userPath, `${id}.json`);
+  const filePath = path.join(userPath, `${user}_${id}.json`);
+
   try {
     const content = await fs.readFile(filePath, 'utf-8');
     return { success: true, funkoPop: JSON.parse(content) };
