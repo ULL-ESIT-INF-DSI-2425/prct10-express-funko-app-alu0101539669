@@ -104,6 +104,7 @@ describe('Express Server', () => {
     
         expect(response.body.success).toBe(true);
     });
+
     test('should update a Funko via PATCH', async () => {
         await request(app)
           .post('/funkos?user=test_user')
@@ -116,6 +117,7 @@ describe('Express Server', () => {
     
         expect(response.body.success).toBe(true);
     });
+
     test('should delete a Funko via DELETE', async () => {
         await request(app)
           .post('/funkos?user=test_user')
@@ -126,6 +128,7 @@ describe('Express Server', () => {
     
         expect(response.body.success).toBe(true);
     });
+
     test('should get a Funko via GET', async () => {
         await request(app)
           .post('/funkos?user=test_user')
@@ -137,6 +140,7 @@ describe('Express Server', () => {
         expect(response.body.success).toBe(true);
         expect(response.body.funkoPop.name).toBe('Goku');
     });
+
     test('should list all Funkos via GET', async () => {
         await request(app)
           .post('/funkos?user=test_user')
@@ -151,6 +155,7 @@ describe('Express Server', () => {
         expect(response.body.success).toBe(true);
         expect(response.body.funkoPops.length).toBe(2);
     });
+    
     test('should return an error when getting non-existent Funko', async () => {
         const response = await request(app)
           .get('/funkos?user=test_user&id=999');

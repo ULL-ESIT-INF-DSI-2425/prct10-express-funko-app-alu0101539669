@@ -6,6 +6,7 @@ const app = express();
 app.use(express.json());
 const port = 3000;
 
+//Añadir un nuevo Funko
 app.post('/funkos', async (req, res) => {
   const user = req.query.user as string;
   const funko = req.body as FunkoPop;
@@ -13,6 +14,7 @@ app.post('/funkos', async (req, res) => {
   res.json(response);
 });
 
+//Actualizar un Funko existente
 app.patch('/funkos', async (req, res) => {
   const user = req.query.user as string;
   const funko = req.body as FunkoPop;
@@ -20,6 +22,7 @@ app.patch('/funkos', async (req, res) => {
   res.json(response);
 });
 
+//Eliminar un Funko existente
 app.delete('/funkos', async (req, res) => {
   const user = req.query.user as string;
   const id = Number(req.query.id);
@@ -27,6 +30,7 @@ app.delete('/funkos', async (req, res) => {
   res.json(response);
 });
 
+//Listar todos los Funkos de un usuario
 app.get('/funkos', async (req, res) => {
   const user = req.query.user as string;
   if (req.query.id) {
@@ -38,6 +42,7 @@ app.get('/funkos', async (req, res) => {
     res.json(response);
   }
 });
+
 
 app.listen(port, () => {
   console.log(`Servidor escuchando en el puerto ${port}`);
