@@ -4,6 +4,7 @@ import * as path from 'path';
 import { addFunko, updateFunko, deleteFunko, getFunko, listFunkos } from '../src/manager';
 import { FunkoPop } from '../src/types';
 import request from 'supertest';
+import {findSpell} from '../src/modi/findSpell'
 
 import app from '../src/server';
 
@@ -187,3 +188,70 @@ describe('Express Server', () => {
         expect(response.body.success).toBe(false);
     });
 }); 
+
+describe("Findspell tests", () => {
+  test("Test with only the name", () => {
+    return findSpell("Opening Charm").then((data) => {
+      expect(data).to.be.eql([
+        {
+          "id": "fbd3cb46-c174-4843-a07e-fd83545dce58",
+          "name": "Opening Charm",
+          "incantation": "Aberto",
+          "effect": "Opens doors",
+          "canBeVerbal": true,
+          "type": "Charm",
+          "light": "Blue",
+          "creator": null
+        }
+      ]);
+    });
+  });
+
+  test("Test with the name and the type", () => {
+    return findSpell("Opening Charm", "Charm").then((data) => {
+      expect(data).to.be.eql([
+        {
+          "id": "fbd3cb46-c174-4843-a07e-fd83545dce58",
+          "name": "Opening Charm",
+          "incantation": "Aberto",
+          "effect": "Opens doors",
+          "canBeVerbal": true,
+          "type": "Charm",
+          "light": "Blue",
+          "creator": null
+        }
+      ]);
+    });
+  });
+
+  test("Test with all", () => {
+    return findSpell("Opening Charm", "Charm", "Aberto").then((data) => {
+      expect(data).to.be.eql([
+        {
+          "id": "fbd3cb46-c174-4843-a07e-fd83545dce58",
+          "name": "Opening Charm",
+          "incantation": "Aberto",
+          "effect": "Opens doors",
+          "canBeVerbal": true,
+          "type": "Charm",
+          "light": "Blue",
+          "creator": null
+        }
+      ]);
+    });
+  });
+  
+  test("Test without parameters", () => {
+    return findSpell().catch((err) => {
+      expect(err).to.be.equal("Error during the HTTP request: " + err.message);
+      
+    });
+  });
+
+  test("Test with body length = 0", () => {
+    return findSpell("DSI").catch((err) => {
+      expect(err.message).to.be.equal("No spell information found.")
+    });
+  });
+    
+});
